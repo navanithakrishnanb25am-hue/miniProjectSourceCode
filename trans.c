@@ -240,16 +240,20 @@ unsigned int enterChoice(void)
 {
     unsigned int menuChoice; // variable to store user's choice
     // display available options
-    printf("%s", "\nEnter your choice\n"
-             "1 - store formatted text file\n"
-             "2 - update an account\n"
-             "3 - add a new account\n"
-             "4 - delete an account\n"
-             "5 - display all accounts\n"
-             "6 - search account\n"
-             "7 - transfer money\n"
-             "8 - initialize file\n"
-             "9 - end program\n? ");
+    printf("%s","\n==========================================\n"
+                 "     BANK ACCOUNT MANAGEMENT SYSTEM"
+                 "\n========================================="
+                 "\nEnter your choice:\n"
+             "1 - To store formatted text file\n"
+             "2 - Update an account\n"
+             "3 - Add a new account\n"
+             "4 - Delete an account\n"
+             "5 - Display all accounts\n"
+             "6 - Search account\n"
+             "7 - Transfer money\n"
+             "8 - Initialize file\n"
+             "9 - Exit\n"
+            "==========================================\n");
 
     scanf("%u", &menuChoice); // receive choice from user
     return menuChoice;
