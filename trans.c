@@ -12,6 +12,8 @@ void searchAccount(FILE *fPtr);
 void transferMoney(FILE *fPtr);
 void initializeFile(void);
 int login(void);
+void addUser(void);
+void changePassword(void);
 
 struct clientData
 {
