@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <conio.h>
+char currentUser[20];
 // clientData structure definition
 void displayRecords(FILE *fPtr);
 void searchAccount(FILE *fPtr);
@@ -87,6 +88,17 @@ int main(int argc, char *argv[])
         printf("Error reopening file!\n");
         exit(1);
         }
+        break;
+
+        case 10:
+        if(strcmp(currentUser,"admin")==0)
+        addUser();
+        else
+        printf("Access denied! Admin only.\n");
+        break;
+
+        case 11:
+        changePassword();
         break;
 
         default:
@@ -253,7 +265,9 @@ unsigned int enterChoice(void)
              "6 - Search account\n"
              "7 - Transfer money\n"
              "8 - Initialize file\n"
-             "9 - Exit\n"
+             "9 - Add user (admin only)\n"
+             "10 - Change password\n"
+             "11 - Exit\n"
             "==========================================\n");
 
     scanf("%u", &menuChoice); // receive choice from user
@@ -379,55 +393,132 @@ int login(void)
     char user[20], pass[20];
     char fileUser[20], filePass[20];
     char ch;
-    int i = 0;
+    int i, attempts = 3;
 
-    FILE *fp = fopen("login.txt","r");
+    while(attempts--)
+    {
+        FILE *fp = fopen("login.txt","r");
+
+        if(fp == NULL)
+        {
+            printf("Login file not found!\n");
+            return 0;
+        }
+
+        printf("\nEnter username: ");
+        scanf("%s", user);
+
+        printf("Enter password: ");
+        i = 0;
+
+        while(1)
+        {
+            ch = getch();
+
+            if(ch == 13) break;
+
+            if(ch == 8 && i > 0)
+            {
+                printf("\b \b");
+                i--;
+            }
+            else if(i < 19)
+            {
+                pass[i++] = ch;
+                printf("*");
+            }
+        }
+
+        pass[i] = '\0';
+
+        while(fscanf(fp,"%s %s", fileUser, filePass) == 2)
+        {
+            if(strcmp(user,fileUser)==0 && strcmp(pass,filePass)==0)
+            {
+                strcpy(currentUser, user);   // IMPORTANT
+                printf("\nLogin successful!\n");
+                fclose(fp);
+                return 1;
+            }
+        }
+
+        fclose(fp);
+        printf("\nInvalid credentials! Attempts left: %d\n", attempts);
+    }
+
+    printf("Too many failed attempts. Access blocked!\n");
+    return 0;
+}
+
+void addUser(void)
+{
+    FILE *fp = fopen("login.txt","a");
 
     if(fp == NULL)
     {
-        printf("Login file not found!\n");
-        return 0;
+        printf("Error opening login file!\n");
+        return;
     }
 
-    printf("Enter username: ");
-    scanf("%s", user);
+    char newUser[20], newPass[20];
 
-    printf("Enter password: ");
+    printf("Enter new username: ");
+    scanf("%s", newUser);
 
-    // hidden password input
-    while(1)
+    printf("Enter new password: ");
+    scanf("%s", newPass);
+
+    fprintf(fp,"%s %s\n", newUser, newPass);
+
+    fclose(fp);
+
+    printf("User added successfully!\n");
+}
+
+void changePassword(void)
+{
+    FILE *fp, *temp;
+    char oldPass[20], newPass[20];
+    char fileUser[20], filePass[20];
+    int found = 0;
+
+    fp = fopen("login.txt", "r");
+    temp = fopen("temp.txt", "w");
+
+    if(fp == NULL || temp == NULL)
     {
-        ch = getch();
-
-        if(ch == 13) // Enter
-            break;
-
-        if(ch == 8 && i > 0) // Backspace
-        {
-            printf("\b \b");
-            i--;
-        }
-        else if(i < 19)
-        {
-            pass[i++] = ch;
-            printf("*");
-        }
+        printf("File error!\n");
+        return;
     }
 
-    pass[i] = '\0';
+    printf("Enter old password: ");
+    scanf("%s", oldPass);
 
-    // check credentials
-    while(fscanf(fp,"%s %s", fileUser, filePass) == 2)
+    while(fscanf(fp, "%s %s", fileUser, filePass) == 2)
     {
-        if(strcmp(user,fileUser)==0 && strcmp(pass,filePass)==0)
+        if(strcmp(currentUser, fileUser) == 0 && strcmp(oldPass, filePass) == 0)
         {
-            printf("\nLogin successful!\n");
-            fclose(fp);
-            return 1;
+            found = 1;
+
+            printf("Enter new password: ");
+            scanf("%s", newPass);
+
+            fprintf(temp, "%s %s\n", currentUser, newPass);
+        }
+        else
+        {
+            fprintf(temp, "%s %s\n", fileUser, filePass);
         }
     }
 
     fclose(fp);
-    printf("\nInvalid username or password!\n");
-    return 0;
+    fclose(temp);
+
+    remove("login.txt");
+    rename("temp.txt", "login.txt");
+
+    if(found)
+        printf("Password changed successfully!\n");
+    else
+        printf("Incorrect old password!\n");
 }
