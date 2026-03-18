@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <conio.h>
 // clientData structure definition
 void displayRecords(FILE *fPtr);
 void searchAccount(FILE *fPtr);
@@ -375,19 +376,58 @@ void initializeFile(void)
 
 int login(void)
 {
-    char password[20];
+    char user[20], pass[20];
+    char fileUser[20], filePass[20];
+    char ch;
+    int i = 0;
 
-    printf("Enter system password: ");
-    scanf("%s", password);
+    FILE *fp = fopen("login.txt","r");
 
-    if(strcmp(password, "admin123") == 0)
+    if(fp == NULL)
     {
-        printf("Access granted!\n");
-        return 1;
-    }
-    else
-    {
-        printf("Access denied!\n");
+        printf("Login file not found!\n");
         return 0;
     }
+
+    printf("Enter username: ");
+    scanf("%s", user);
+
+    printf("Enter password: ");
+
+    // hidden password input
+    while(1)
+    {
+        ch = getch();
+
+        if(ch == 13) // Enter
+            break;
+
+        if(ch == 8 && i > 0) // Backspace
+        {
+            printf("\b \b");
+            i--;
+        }
+        else if(i < 19)
+        {
+            pass[i++] = ch;
+            printf("*");
+        }
+    }
+
+    pass[i] = '\0';
+
+    // check credentials
+    while(fscanf(fp,"%s %s", fileUser, filePass) == 2)
+    {
+        if(strcmp(user,fileUser)==0 && strcmp(pass,filePass)==0)
+        {
+            printf("\nLogin successful!\n");
+            fclose(fp);
+            return 1;
+        }
+    }
+
+    fclose(fp);
+    printf("\nInvalid username or password!\n");
+    return 0;
 }
