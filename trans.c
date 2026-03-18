@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     }
 
     // enable user to specify action
-    while ((choice = enterChoice()) != 9)
+    while ((choice = enterChoice()) != 11)
     {
         switch (choice)
         {
@@ -70,38 +70,47 @@ int main(int argc, char *argv[])
             break;
         // display if user does not select valid choice
         case 5:
-        displayRecords(cfPtr);
-        break;
+            displayRecords(cfPtr);
+            break;
 
          case 6:
-         searchAccount(cfPtr);
-         break;
+            searchAccount(cfPtr);
+            break;
 
         case 7:
-        transferMoney(cfPtr);
-        break;
+            transferMoney(cfPtr);
+            break;
 
         case 8:
-        initializeFile();
-        fclose(cfPtr);
-        cfPtr = fopen("credit.dat","rb+");
+            initializeFile();
+            fclose(cfPtr);
+            cfPtr = fopen("credit.dat","rb+");
 
-        if(cfPtr == NULL){
-        printf("Error reopening file!\n");
-        exit(1);
-        }
-        break;
+            if(cfPtr == NULL){
+                printf("Error reopening file!\n");
+                exit(1);
+                }
+            break;
+
+        case 9:
+            if(strcmp(currentUser,"admin")==0)
+            {
+                addUser();
+            }
+            else
+            {
+                printf("Access denied! Admin only.\n");
+            }
+            break;
 
         case 10:
-        if(strcmp(currentUser,"admin")==0)
-        addUser();
-        else
-        printf("Access denied! Admin only.\n");
-        break;
+            changePassword();
+            break;
 
         case 11:
-        changePassword();
-        break;
+            printf("Thank you for using the Bank Account Program.\n");
+            break;
+
 
         default:
             puts("Incorrect choice");
