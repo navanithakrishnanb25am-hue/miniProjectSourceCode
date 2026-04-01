@@ -32,12 +32,11 @@ void deleteRecord(FILE *fPtr);
 
 int main(int argc, char *argv[])
 {
-    FILE *cfPtr;         // credit.dat file pointer
+    FILE *cfPtr = NULL;  // credit.dat file pointer
     unsigned int choice; // user's choice
 
     if(!login())
     {
-        fclose(cfPtr);   // good practice
         return 0;
     }
     // fopen opens the file; exits if file cannot be opened
@@ -119,6 +118,7 @@ int main(int argc, char *argv[])
     }     // end while
 
     fclose(cfPtr); // fclose closes the file
+    return 0;
 } // end main
 
 // create formatted text file for printing
