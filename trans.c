@@ -253,7 +253,7 @@ void newRecord(FILE *fPtr)
 
         client.acctNum = accountNum;
         // move file pointer to correct record in file
-        fseek(fPtr, (client.acctNum - 1) * sizeof(struct clientData), SEEK_SET);
+
         // insert record in file
         fwrite(&client, sizeof(struct clientData), 1, fPtr);
     } // end else
